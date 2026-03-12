@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>DISPAGZ</title>
+  <!-- Font & icons (Font Awesome for slide arrows & video play) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background: #f5f1ee;  /* soft paper tone */
+      display: flex;
+      justify-content: center;
+    }
+
+    .news-wrapper {
+      max-width: 1100px;
+      width: 100%;
+      background: white;
+      box-shadow: 0 0 40px rgba(0,0,0,0.04);
+      margin: 20px 15px;
+      border-radius: 32px 32px 28px 28px;
+      overflow: hidden;
+    }
+
+    /* header branding */
+    .brand-bar {
+      background: #121212;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 3px solid #f9c74f;
+    }
+    .brand-icon {
+      background: #f9c74f;
+      color: #121212;
+      font-weight: 800;
+      font-size: 1.6rem;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .brand-text {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: white;
+    }
+    .brand-text span {
+      color: #f9c74f;
+      font-weight: 300;
+      font-size: 1.4rem;
+      margin-left: 5px;
+    }
+
+    /* date line */
+    .dateline {
+      display: flex;
+      justify-content: space-between;
+      padding: 18px 24px 8px 24px;
+      color: #6b6b6b;
+      font-weight: 500;
+      font-size: 0.95rem;
+      border-bottom: 1px solid #e0dcd9;
+    }
+    .date {
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .category {
+      background: #ffe9d1;
+      padding: 4px 14px;
+      border-radius: 40px;
+      color: #a04e1a;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    /* ===== SLIDESHOW (3 images, draggable + arrows) ===== */
+    .slideshow-container {
+      position: relative;
+      max-width: 100%;
+      margin: 20px 24px 10px 24px;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 12px 30px -10px rgba(0,0,0,0.2);
+    }
+
+    .slides {
+      display: flex;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;  /* firefox */
+      background: #1e1e1e;
+      border-radius: 28px;
+    }
+    .slides::-webkit-scrollbar {
+      display: none;  /* hide scrollbar but keep functionality */
+    }
+
+    .slide {
+      flex: 0 0 100%;
+      scroll-snap-align: start;
+      aspect-ratio: 16 / 10;
+    }
+    .slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #ccc;
+    }
+
+    /* slide controls */
+    .slide-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(4px);
+      border: none;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      font-size: 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #222;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      transition: all 0.15s;
+      z-index: 10;
+    }
+    .slide-btn:hover {
+      background: white;
+      transform: translateY(-50%) scale(1.05);
+    }
+    .prev { left: 16px; }
+    .next { right: 16px; }
+
+    /* slide indicators (dots) */
+    .slide-indicators {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 10px 0 12px 0;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      background: #cfc9c4;
+      border-radius: 20px;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    .dot.active {
+      background: #b1521e;
+      width: 28px;
+    }
+
+    /* main title */
+    h1 {
+      font-size: 2.3rem;
+      line-height: 1.2;
+      margin: 20px 24px 12px 24px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #1d1d1d;
+      border-left: 8px solid #f9c74f;
+      padding-left: 20px;
+    }
+
+    /* article text */
+    .article-content {
+      margin: 0 24px 30px 24px;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: #2d2d2d;
+    }
+
+    .article-content p {
+      margin-bottom: 1.5rem;
+    }
+
+    .article-content strong {
+      color: #a13000;
+      font-weight: 600;
+    }
+
+    /* embedded video block */
+    .video-block {
+      margin: 30px 0 30px 0;
+      background: #0b0b0b;
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow: 0 18px 30px -10px rgba(0,0,0,0.4);
+    }
+    .video-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #161616;
+      padding: 12px 20px;
+      color: white;
+      font-weight: 600;
+      border-bottom: 1px solid #333;
+    }
+    .video-label i {
+      color: #f9c74f;
+      font-size: 1.5rem;
+    }
+    .video-placeholder {
+      width: 100%;
+      background: #2b2b2b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .video-placeholder video {
+      width: 100%;
+      max-height: 400px;
+      outline: none;
+      display: block;
+    }
+    /* fallback text if video doesn't load */
+    .video-fallback-note {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 30px;
+    }
+
+    /* blockquote style for source whisper */
+    .insider-quote {
+      background: #fbf4e8;
+      padding: 24px 28px;
+      border-radius: 40px 40px 40px 12px;
+      margin: 30px 0 20px 0;
+      font-style: italic;
+      border-left: 4px solid #f9c74f;
+      font-size: 1.1rem;
+      color: #2c2c2c;
+      box-shadow: inset 0 -2px 10px rgba(0,0,0,0.02);
+    }
+    .insider-quote i {
+      color: #a74500;
+      margin-right: 8px;
+    }
+
+    /* tag / footer */
+    .article-footer {
+      margin-top: 25px;
+      border-top: 1px solid #ece3db;
+      padding: 20px 24px 24px 24px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      color: #887f78;
+      font-size: 0.95rem;
+    }
+    .share-icons i {
+      font-size: 1.4rem;
+      margin-left: 18px;
+      color: #555;
+      transition: color 0.2s;
+    }
+    .share-icons i:hover {
+      color: #b84a1c;
+    }
+
+    /* responsive fine-tune */
+    @media (max-width: 600px) {
+      .brand-text { font-size: 1.7rem; }
+      .brand-text span { font-size: 1.2rem; }
+      h1 { font-size: 1.9rem; margin: 15px 18px 10px 18px; }
+      .slideshow-container { margin: 10px 18px; }
+      .article-content { margin: 0 18px 20px 18px; font-size: 1rem; }
+      .slide-btn { width: 38px; height: 38px; font-size: 1.5rem; }
+      .video-block { margin: 20px 0; }
+      .insider-quote { padding: 18px 20px; }
+      .brand-bar { padding: 12px 18px; }
+    }
+
+    /* desktop enhancements */
+    @media (min-width: 1000px) {
+      h1 { font-size: 2.8rem; max-width: 90%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="news-wrapper">
+    <!-- header -->
+    <div class="brand-bar">
+      <div class="brand-icon">D</div>
+      <div class="brand-text">DISPAGZ<span>//celeb</span></div>
+    </div>
+
+    <!-- date + category -->
+    <div class="dateline">
+      <span class="date"><i class="far fa-calendar-alt" style="margin-right: 6px;"></i>13 MARCH 2026</span>
+      <span class="category"><i class="fas fa-microphone-alt" style="margin-right: 6px;"></i>EXCLUSIVE / CONTROVERSY</span>
+    </div>
+
+    <!-- 3‑photo slideshow (13Mar1.png , 13Mar2.png , 13Mar3.png) -->
+    <div class="slideshow-container" id="slideshow">
+      <div class="slides" id="slidesScroll">
+        <div class="slide"><img src="13Mar1.png" alt="Kafka at airport arrival" loading="lazy"></div>
+        <div class="slide"><img src="13Mar2.png" alt="Kafka with media crowd" loading="lazy"></div>
+        <div class="slide"><img src="13Mar3.png" alt="Reporters surrounding Kafka" loading="lazy"></div>
+      </div>
+
+      <!-- arrows -->
+      <button class="slide-btn prev" id="prevSlide" aria-label="previous slide"><i class="fas fa-chevron-left"></i></button>
+      <button class="slide-btn next" id="nextSlide" aria-label="next slide"><i class="fas fa-chevron-right"></i></button>
+    </div>
+
+    <!-- dots indicator -->
+    <div class="slide-indicators" id="slideDots">
+      <span class="dot active"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+
+    <!-- headline -->
+    <h1>Controversy Surrounds Novelist Kafka After Airport Incident in Japan</h1>
+
+    <!-- article body -->
+    <div class="article-content">
+      <p><strong>Renowned novelist and media entrepreneur Kafka</strong> has come under public scrutiny following an incident at Narita International Airport earlier this week. The writer, who recently arrived in Japan ahead of an event celebrating the release of his latest novel, was reportedly seen behaving harshly toward members of the press waiting at the terminal.</p>
+
+      <p>Several reporters from local and international media outlets had gathered at the arrival area in anticipation of brief comments from the author. Witnesses claimed that Kafka appeared visibly irritated by the crowd and responded sharply while attempting to move through the group.</p>
+
+      <p>According to footage circulating online, Kafka was heard saying, <strong>“Can you move aside? Give me some space. I’m not a celebrity. Just let me pass.”</strong> His tone was described by observers as blunt and impatient, with some reporters stating that the exchange felt unnecessarily confrontational.</p>
+
+      <!-- VIDEO INSERTED MIDDLE (maret13.mp4) -->
+      <div class="video-block">
+        <div class="video-label">
+          <i class="fas fa-play-circle"></i> <span>SCENE AT NARITA · raw clip (maret13.mp4)</span>
+        </div>
+        <div class="video-placeholder">
+          <!-- actual video element with controls -->
+          <video controls preload="metadata" poster="13Mar1.png">
+            <source src="maret13.mp4" type="video/mp4">
+            <!-- fallback if unsupported or file missing -->
+            <div class="video-fallback-note">
+              <i class="fas fa-video-slash" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+              Your browser does not support the video tag.<br> Video file: maret13.mp4
+            </div>
+          </video>
+        </div>
+      </div>
+
+      <p>The incident quickly gained traction across social media platforms and entertainment news outlets, with many users debating whether the reaction was a moment of exhaustion from a busy schedule or an example of unprofessional behavior toward fellow media workers.</p>
+
+      <p>The controversy has also raised questions due to Kafka’s position as the figure behind <strong>The Kachoo</strong>, a company known for its media and news presence. Critics have pointed out the irony of a prominent media figure appearing dismissive toward journalists.</p>
+
+      <!-- insider quote (dramatic) -->
+      <div class="insider-quote">
+        <i class="fas fa-quote-left" style="opacity: 0.6;"></i> I’ve known Kafka personally for a long time. But lately, ever since his name became more popular, he’s become rough and often lashes out. It feels like the Kafka I used to know is gone. Honestly, he’s started to act more like a street thug now.
+        <div style="margin-top: 14px; font-style: normal; font-weight: 500;">— source claiming to be close to Kafka</div>
+      </div>
+
+      <p>Fueling the discussion further, an individual claiming to be close to Kafka offered a statement that painted a troubling picture of the writer’s recent personality changes. The remark has intensified online speculation about the author’s temperament and personal conduct behind the scenes.</p>
+
+      <p>As the story continues to circulate, neither Kafka nor his team has issued an official statement addressing the situation. Meanwhile, attention remains focused on his upcoming appearance in Japan, where he is expected to participate in events related to the launch of his newest literary work.</p>
+    </div>
+
+    <!-- footer / meta -->
+    <div class="article-footer">
+      <span><i class="far fa-clock"></i> 13 March 2026 — updated 2h ago</span>
+      <span class="share-icons">
+        <i class="fab fa-instagram"></i>
+        <i class="fab fa-twitter"></i>
+        <i class="fab fa-whatsapp"></i>
+      </span>
+    </div>
+  </div>
+
+  <!-- tiny slideshow logic: scroll + dots + arrows -->
+  <script>
+    (function() {
+      const slidesContainer = document.getElementById('slidesScroll');
+      const prevBtn = document.getElementById('prevSlide');
+      const nextBtn = document.getElementById('nextSlide');
+      const dots = document.querySelectorAll('.dot');
+      const totalSlides = document.querySelectorAll('.slide').length;
+
+      if (!slidesContainer || !prevBtn || !nextBtn) return;
+
+      // scroll snap helper: get current slide index (0-based)
+      function getCurrentIndex() {
+        if (!slidesContainer) return 0;
+        const scrollLeft = slidesContainer.scrollLeft;
+        const slideWidth = slidesContainer.clientWidth;
+        // avoid division by zero
+        if (slideWidth === 0) return 0;
+        return Math.round(scrollLeft / slideWidth);
+      }
+
+      // scroll to a given index (with smooth)
+      function scrollToIndex(idx) {
+        if (!slidesContainer) return;
+        const slideWidth = slidesContainer.clientWidth;
+        slidesContainer.scrollTo({
+          left: idx * slideWidth,
+          behavior: 'smooth'
+        });
+        updateDots(idx);
+      }
+
+      // update active dot
+      function updateDots(activeIdx) {
+        dots.forEach((dot, i) => {
+          if (i === activeIdx) dot.classList.add('active');
+          else dot.classList.remove('active');
+        });
+      }
+
+      // listen to scroll to keep dots in sync
+      slidesContainer.addEventListener('scroll', () => {
+        if (slidesContainer.clientWidth === 0) return;
+        const idx = getCurrentIndex();
+        updateDots(idx);
+      });
+
+      // prev / next actions
+      prevBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const current = getCurrentIndex();
+        const prev = current > 0 ? current - 1 : totalSlides - 1;
+        scrollToIndex(prev);
+      });
+
+      nextBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const current = getCurrentIndex();
+        const next = (current + 1) % totalSlides;
+        scrollToIndex(next);
+      });
+
+      // dot click navigation
+      dots.forEach((dot, idx) => {
+        dot.addEventListener('click', () => {
+          scrollToIndex(idx);
+        });
+      });
+
+      // on window resize ensure we don't break index (active dot may shift slightly) — optional
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          const currentIdx = getCurrentIndex();
+          updateDots(currentIdx);
+        }, 150);
+      });
+
+      // initial call to set proper dot (just in case scroll resets)
+      setTimeout(() => {
+        const idx = getCurrentIndex();
+        updateDots(idx);
+      }, 80);
+    })();
+  </script>
+
+  <!-- subtle note: image fallback if png missing – but it's just placeholder names -->
+  <!-- video file name: maret13.mp4 (embedded) -->
+  <!-- all good -->
+</body>
+</html>
